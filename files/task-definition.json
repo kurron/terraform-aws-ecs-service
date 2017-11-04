@@ -14,12 +14,6 @@
                 }
             ],
             "essential": true,
-            "environment": [
-                {
-                    "name": "FOO",
-                    "value": "bar"
-                }
-            ],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
