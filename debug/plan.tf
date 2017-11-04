@@ -3,29 +3,15 @@ terraform {
     backend "s3" {}
 }
 
-data "terraform_remote_state" "vpc" {
-    backend = "s3"
-    config {
-        bucket = "transparent-test-terraform-state"
-        key    = "us-west-2/debug/networking/vpc/terraform.tfstate"
-        region = "us-east-1"
-    }
+provider "aws" {
+    region     = "${var.region}"
 }
 
-data "terraform_remote_state" "security-groups" {
+data "terraform_remote_state" "ecs_cluster" {
     backend = "s3"
     config {
         bucket = "transparent-test-terraform-state"
-        key    = "us-west-2/debug/networking/security-groups/terraform.tfstate"
-        region = "us-east-1"
-    }
-}
-
-data "terraform_remote_state" "bastion" {
-    backend = "s3"
-    config {
-        bucket = "transparent-test-terraform-state"
-        key    = "us-west-2/debug/compute/bastion/terraform.tfstate"
+        key    = "us-west-2/debug/compute/ecs/terraform.tfstate"
         region = "us-east-1"
     }
 }
@@ -39,32 +25,71 @@ data "terraform_remote_state" "iam" {
     }
 }
 
-module "ecs" {
+data "terraform_remote_state" "vpc" {
+    backend = "s3"
+    config {
+        bucket = "transparent-test-terraform-state"
+        key    = "us-west-2/debug/networking/vpc/terraform.tfstate"
+        region = "us-east-1"
+    }
+}
+
+data "terraform_remote_state" "alb" {
+    backend = "s3"
+    config {
+        bucket = "transparent-test-terraform-state"
+        key    = "us-west-2/debug/compute/alb/terraform.tfstate"
+        region = "us-east-1"
+    }
+}
+
+variable "region" {
+    type = "string"
+    default = "us-west-2"
+}
+
+module "target_group" {
+    source = "github.com/kurron/terraform-aws-alb-target-group"
+
+    region                         = "${var.region}"
+    name                           = "Nginx"
+    project                        = "Debug"
+    purpose                        = "Balance to Nginx containers"
+    creator                        = "kurron@jvmguy.com"
+    environment                    = "development"
+    freetext                       = "No notes at this time."
+    port                           = "2020"
+    protocol                       = "HTTP"
+    vpc_id                         = "${data.terraform_remote_state.vpc.vpc_id}"
+    enable_stickiness              = "Yes"
+    health_check_interval          = "30"
+    health_check_path              = "/"
+    health_check_protocol          = "HTTP"
+    health_check_timeout           = "5"
+    health_check_healthy_threshold = "5"
+    unhealthy_threshold            = "2"
+    matcher                        = "200-299"
+    load_balancer_arn              = "${data.terraform_remote_state.alb.alb_arn}"
+}
+
+resource "aws_ecs_task_definition" "definition" {
+    family                = "Nginx"
+    container_definitions = "${file("files/task-definition.json")}"
+    network_mode          = "bridge"
+}
+
+module "ecs_service" {
     source = "../"
 
-    region                           = "us-west-2"
-    name                             = "Debug_Cluster"
-    project                          = "Debug"
-    purpose                          = "Docker scheduler"
-    creator                          = "kurron@jvmguy.com"
-    environment                      = "development"
-    freetext                         = "Workers are based on spot intances."
-    ami_regexp                       = "^amzn-ami-.*-amazon-ecs-optimized$"
-    instance_type                    = "m3.medium"
-    instance_profile                 = "${data.terraform_remote_state.iam.ecs_profile_id}"
-    ssh_key_name                     = "${data.terraform_remote_state.bastion.ssh_key_name}"
-    security_group_ids               = ["${data.terraform_remote_state.security-groups.ec2_id}"]
-    ebs_optimized                    = "false"
-    spot_price                       = "0.0670"
-    cluster_min_size                 = "1"
-    cluster_desired_size             = "${length( data.terraform_remote_state.vpc.public_subnet_ids )}"
-    cluster_max_size                 = "${length( data.terraform_remote_state.vpc.public_subnet_ids )}"
-    cooldown                         = "90"
-    health_check_grace_period        = "300"
-    subnet_ids                       = "${data.terraform_remote_state.vpc.public_subnet_ids}"
-    scale_down_cron                  = "0 7 * * SUN-SAT"
-    scale_up_cron                    = "0 0 * * MON-FRI"
-    cluster_scaled_down_min_size     = "0"
-    cluster_scaled_down_desired_size = "0"
-    cluster_scaled_down_max_size     = "0"
+    region                             = "${var.region}"
+    name                               = "Nginx"
+    task_definition_arn                = "${aws_ecs_task_definition.definition.arn}"
+    desired_count                      = "2"
+    cluster_arn                        = "${data.terraform_remote_state.ecs_cluster.cluster_arn}"
+    iam_role                           = "${data.terraform_remote_state.iam.ecs_profile_id}"
+    deployment_maximum_percent         = "200"
+    deployment_minimum_healthy_percent = "50"
+    target_group_arn                   = "${module.target_group.target_group_arn}"
+    container_name                     = "first"
+    container_port                     = "80"
 }

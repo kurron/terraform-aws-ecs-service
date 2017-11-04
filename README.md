@@ -1,6 +1,5 @@
 # Overview
-This Terraform module creates an ECS cluster backed by Spot instances.  You
-have to create Task Definitions and Services in order to deploy containers.
+This Terraform module creates an ECS Service, attaching in to an ECS Cluster.
 
 # Prerequisites
 * [Terraform](https://terraform.io/) installed and working
