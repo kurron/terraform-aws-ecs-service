@@ -90,6 +90,6 @@ module "ecs_service" {
     deployment_maximum_percent         = "200"
     deployment_minimum_healthy_percent = "50"
     target_group_arn                   = "${module.target_group.target_group_arn}"
-    container_name                     = "first"
+    container_name                     = "Nginx"
     container_port                     = "80"
 }
