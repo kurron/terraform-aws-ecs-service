@@ -16,7 +16,7 @@
             "logDriver": "awslogs",
             "options": {
                 "awslogs-region": "us-west-2",
-                "awslogs-group": "terra"
+                "awslogs-group": "debug"
             }
         }
     }

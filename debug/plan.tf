@@ -58,7 +58,7 @@ module "target_group" {
     creator                        = "kurron@jvmguy.com"
     environment                    = "development"
     freetext                       = "No notes at this time."
-    port                           = "2020"
+    port                           = "80"
     protocol                       = "HTTP"
     vpc_id                         = "${data.terraform_remote_state.vpc.vpc_id}"
     enable_stickiness              = "Yes"
