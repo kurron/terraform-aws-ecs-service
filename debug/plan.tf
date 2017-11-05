@@ -62,7 +62,7 @@ module "target_group" {
     protocol                       = "HTTP"
     vpc_id                         = "${data.terraform_remote_state.vpc.vpc_id}"
     enable_stickiness              = "Yes"
-    health_check_interval          = "30"
+    health_check_interval          = "10"
     health_check_path              = "/"
     health_check_protocol          = "HTTP"
     health_check_timeout           = "5"

@@ -12,6 +12,8 @@
             }
         ],
         "essential": true,
+        "hostname": "nginx",
+        "disableNetworking": false,
         "logConfiguration": {
             "logDriver": "awslogs",
             "options": {
