@@ -74,7 +74,7 @@ module "target_group" {
 
 resource "aws_ecs_task_definition" "definition" {
     family                = "Nginx"
-    container_definitions = "${file("files/task-definition.json")}"
+    container_definitions = "${file("debug/files/task-definition.json")}"
     network_mode          = "bridge"
 }
 
@@ -86,7 +86,7 @@ module "ecs_service" {
     task_definition_arn                = "${aws_ecs_task_definition.definition.arn}"
     desired_count                      = "2"
     cluster_arn                        = "${data.terraform_remote_state.ecs_cluster.cluster_arn}"
-    iam_role                           = "${data.terraform_remote_state.iam.ecs_profile_id}"
+    iam_role                           = "${data.terraform_remote_state.iam.ecs_role_arn}"
     deployment_maximum_percent         = "200"
     deployment_minimum_healthy_percent = "50"
     target_group_arn                   = "${module.target_group.target_group_arn}"
