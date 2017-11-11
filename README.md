@@ -1,5 +1,8 @@
 # Overview
 This Terraform module creates an ECS Service, attaching in to an ECS Cluster.
+It also constructs the ALB Target Group, binding it to the service.  The ALB
+is expected to already have a listener that can forward to the new listener,
+using path based routing.
 
 # Prerequisites
 * [Terraform](https://terraform.io/) installed and working
