@@ -83,7 +83,7 @@ module "ecs_service" {
     unhealthy_threshold            = "2"
     matcher                        = "200-299"
 
-    path_pattern                   = "/alpha/*"
+    path_pattern                   = "/alpha*"
     rule_priority                  = "1"
     vpc_id                         = "${data.terraform_remote_state.vpc.vpc_id}"
     secure_listener_arn            = "${data.terraform_remote_state.alb.secure_listener_arn}"
