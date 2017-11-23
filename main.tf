@@ -78,7 +78,7 @@ resource "aws_ecs_service" "service" {
         container_port   = "${var.container_port}"
     }
     placement_strategy = {
-        type  = "binpack"
-        field = "memory"
+        type  = "spread"
+        field = "instanceId"
     }
 }

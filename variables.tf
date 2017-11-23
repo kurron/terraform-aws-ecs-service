@@ -135,5 +135,5 @@ variable "rule_priority" {
 
 variable "path_pattern" {
     type = "string"
-    description = "The path patterns to match, e.g. /my-service/*"
+    description = "The path patterns to match, e.g. /my-service*"
 }
