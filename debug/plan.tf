@@ -99,10 +99,24 @@ module "ecs_service" {
     container_port                     = "80"
     container_protocol                 = "HTTP"
 
-    placement_strategy_type  = "spread"
-    placement_strategy_field = "instanceId"
-    placement_constraints    = {
-        "type" = "distinctInstance"
-    }
+    placement_strategies = [
+        {
+            "type"  = "spread"
+            "field" = "attribute:ecs.availability-zone"
+        },
+        {
+            "type"  = "binpack"
+            "field" = "memory"
+        }
+    ]
+    placement_constraints    = [
+        {
+            "type" = "distinctInstance"
+        },
+        {
+            "type"       = "memberOf"
+            "expression" = "attribute:ecs.instance-type =~ t2.*"
+        }
+    ]
 
 }

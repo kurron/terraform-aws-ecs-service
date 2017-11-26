@@ -87,6 +87,6 @@ resource "aws_ecs_service" "service" {
         container_name   = "${var.container_name}"
         container_port   = "${var.container_port}"
     }
-    placement_strategy = ["${map( "type", "${var.placement_strategy_type}", "field", "${var.placement_strategy_field}")}"]
-    placement_constraints = ["${var.placement_constraints}"]
+    placement_strategy = "${var.placement_strategies}"
+    placement_constraints = "${var.placement_constraints}"
 }
