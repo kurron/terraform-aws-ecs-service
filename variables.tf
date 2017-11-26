@@ -147,3 +147,9 @@ variable "placement_strategy_field" {
     type = "string"
     description = "For the spread placement strategy, valid values are instanceId or any platform or custom attribute that is applied to a container instance. For the binpack type, valid values are memory and cpu. For the random type, this attribute is not needed."
 }
+
+variable "placement_constraints" {
+    type = "map"
+    description = "Hints to the scheduler as to which ECS instances to place the container on. A 'type' key can be 'distinctInstance' and 'memberOf'. The 'expression' key is only required when 'memberOf' is in play."
+    default = {}
+}

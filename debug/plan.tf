@@ -101,5 +101,8 @@ module "ecs_service" {
 
     placement_strategy_type  = "spread"
     placement_strategy_field = "instanceId"
+    placement_constraints    = {
+        "type" = "distinctInstance"
+    }
 
 }

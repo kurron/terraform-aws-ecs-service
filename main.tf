@@ -64,6 +64,16 @@ resource "aws_lb_listener_rule" "secure_rule" {
     }
 }
 
+variable "yes" {
+    type = "map"
+    default = { "type" = "distinctInstance" }
+}
+
+variable "no" {
+    type = "map"
+    default = {  }
+}
+
 resource "aws_ecs_service" "service" {
     name                               = "${var.name}"
     task_definition                    = "${var.task_definition_arn}"
@@ -78,4 +88,5 @@ resource "aws_ecs_service" "service" {
         container_port   = "${var.container_port}"
     }
     placement_strategy = ["${map( "type", "${var.placement_strategy_type}", "field", "${var.placement_strategy_field}")}"]
+    placement_constraints = ["${var.placement_constraints}"]
 }
