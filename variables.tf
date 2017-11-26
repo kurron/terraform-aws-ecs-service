@@ -137,3 +137,13 @@ variable "path_pattern" {
     type = "string"
     description = "The path patterns to match, e.g. /my-service*"
 }
+
+variable "placement_strategy_type" {
+    type = "string"
+    description = "The type of placement strategy. Must be one of: binpack, random, or spread."
+}
+
+variable "placement_strategy_field" {
+    type = "string"
+    description = "For the spread placement strategy, valid values are instanceId or any platform or custom attribute that is applied to a container instance. For the binpack type, valid values are memory and cpu. For the random type, this attribute is not needed."
+}

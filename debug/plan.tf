@@ -89,7 +89,6 @@ module "ecs_service" {
     secure_listener_arn            = "${data.terraform_remote_state.alb.secure_listener_arn}"
     insecure_listener_arn          = "${data.terraform_remote_state.alb.insecure_listener_arn}"
 
-
     task_definition_arn                = "${aws_ecs_task_definition.definition.arn}"
     desired_count                      = "2"
     cluster_arn                        = "${data.terraform_remote_state.ecs_cluster.cluster_arn}"
@@ -99,4 +98,8 @@ module "ecs_service" {
     container_name                     = "Nginx"
     container_port                     = "80"
     container_protocol                 = "HTTP"
+
+    placement_strategy_type  = "spread"
+    placement_strategy_field = "instanceId"
+
 }
